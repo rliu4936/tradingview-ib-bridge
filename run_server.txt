@@ -1,0 +1,3 @@
+uvicorn main:app --reload --port 80
+
+ngrok http 80
