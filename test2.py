@@ -4,7 +4,7 @@ ib = IB()
 ib.connect('127.0.0.1', 7497, clientId=1)
 
 # Define a stock contract
-contract = Stock('AAPL', 'SMART', 'USD')
+contract = Stock('SQQQ', 'SMART', 'USD')
 ib.qualifyContracts(contract)
 
 # Place a market order
