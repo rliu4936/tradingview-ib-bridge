@@ -62,7 +62,7 @@ async def place_order(action: str, ticker: str, quantity: int):
     """Place an order using the IB API asynchronously."""
     try:
         # Define a stock contract
-        contract = Stock("AAPL", 'SMART', 'USD')
+        contract = Stock("A", 'SMART', 'USD')
         await ib.qualifyContractsAsync(contract)  # Use the asynchronous version
         
         # Determine order type based on action
@@ -75,3 +75,6 @@ async def place_order(action: str, ticker: str, quantity: int):
     except Exception as e:
         print(f"Error placing order: {e}")
         raise HTTPException(status_code=500, detail="Error placing order")
+    
+
+    
