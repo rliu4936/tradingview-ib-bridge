@@ -77,4 +77,3 @@ async def place_order(action: str, ticker: str, quantity: int):
         raise HTTPException(status_code=500, detail="Error placing order")
     
 
-    

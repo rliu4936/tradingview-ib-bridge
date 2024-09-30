@@ -1,0 +1,30 @@
+//@version=5
+strategy("MA Cross Strategy (Buy/Sell)", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=100)
+
+fixed_timeframe = input.timeframe("1", "Moving Average Timeframe") 
+
+shortlen = input.int(9, "Short MA Length", minval=1)
+longlen = input.int(21, "Long MA Length", minval=1)
+
+// Fetch moving averages from the specified fixed_timeframe
+short = request.security(syminfo.tickerid, fixed_timeframe, ta.sma(close, shortlen))
+long = request.security(syminfo.tickerid, fixed_timeframe, ta.sma(close, longlen))
+
+plot(short, color = color.rgb(89, 0, 255), title="Short MA")
+plot(long, color = color.rgb(235, 23, 207), title="Long MA")
+
+// Detect the crossover conditions for long trades
+longCondition = ta.crossover(short, long)
+exitCondition = ta.crossunder(short, long)
+
+// Plot the cross
+plotshape(series=longCondition ? short : na, title="Long Entry", location=location.absolute, style=shape.triangleup, size=size.small, color=color.new(#2962FF, 0))
+plotshape(series=exitCondition ? long : na, title="Long Exit", location=location.absolute, style=shape.triangledown, size=size.small, color=color.new(#FF0000, 0))
+
+// Execute buy/sell trades
+if (longCondition)
+    strategy.order("buy", strategy.long)
+
+if (exitCondition)
+    strategy.order("sell", strategy.short)
+
