@@ -121,12 +121,6 @@ The server exposes a `/webhook` endpoint that accepts POST requests with the fol
 You can test the endpoint using `curl` or tools like Postman:
 
 ```bash
-curl -X POST "http://127.0.0.1:80/webhook" -H "Content-Type: application/json" -d '{"action": "buy", "ticker": "AAPL", "quantity": 10}'
-```
-
-Or using the Ngrok URL:
-
-```bash
 curl -X POST "http://abc123.ngrok.io/webhook" -H "Content-Type: application/json" -d '{"action": "buy", "ticker": "AAPL", "quantity": 10}'
 ```
 
