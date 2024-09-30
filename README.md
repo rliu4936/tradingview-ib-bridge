@@ -119,3 +119,7 @@ curl -X POST "http://abc123.ngrok.io/webhook" -H "Content-Type: application/json
 ## Shutting Down
 
 To stop the server, press `CTRL + C` in the terminal where `uvicorn` and `ngrok` are running.
+
+```bash
+ngrok http --domain=mullet-legal-jolly.ngrok-free.app 80
+```
