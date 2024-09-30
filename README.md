@@ -33,15 +33,7 @@ This project integrates FastAPI with the Interactive Brokers (IB) API to handle 
 3. Install the required dependencies:
 
    ```bash
-   pip install -r requirements.txt
-   ```
-
-   Ensure `requirements.txt` includes:
-
-   ```
-   fastapi
-   uvicorn
-   ib_insync
+   pip install fastapi uvicorn ib_insync
    ```
 
 4. Install Ngrok from the [official website](https://ngrok.com/download) and set it up.
