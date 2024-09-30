@@ -9,6 +9,7 @@ This project integrates FastAPI with the Interactive Brokers (IB) API to handle 
 - `fastapi` library
 - `uvicorn` server
 - `ibapi` library (for direct IB API access)
+- Ngrok (to expose your local server to the internet)
 - An active IB Gateway or Trader Workstation (TWS) running and configured for API access.
 
 ## Installation
@@ -45,6 +46,8 @@ This project integrates FastAPI with the Interactive Brokers (IB) API to handle 
    pip install ibapi
    ```
 
+5. Install Ngrok from the [official website](https://ngrok.com/download) and set it up.
+
 ## Setting up Trader Workstation (TWS)
 
 Ensure that your IB Gateway or TWS is running and accessible on `localhost` at port `7497`:
@@ -56,12 +59,20 @@ Ensure that your IB Gateway or TWS is running and accessible on `localhost` at p
 
 ## Running the Application
 
-Start the FastAPI server using `uvicorn`:
+You **must** run the FastAPI server on port 80, and expose it to the internet using Ngrok.
+
+### Start the FastAPI Server
 ```bash
-uvicorn main:app --reload --port 8000
+uvicorn main:app --reload --port 80
 ```
 - Replace `main` with your actual script name if it's different.
-- Replace `8000` with your preferred port.
+
+### Start Ngrok
+In a separate terminal window, run:
+```bash
+ngrok http 80
+```
+- Ngrok will provide a URL (e.g., `http://abc123.ngrok.io`) that exposes your local server to the internet.
 
 ## Webhook Endpoint
 
@@ -82,17 +93,21 @@ The server exposes a `/webhook` endpoint that accepts POST requests with the fol
 ### Sample Request
 You can test the endpoint using `curl` or tools like Postman:
 ```bash
-curl -X POST "http://127.0.0.1:8000/webhook" -H "Content-Type: application/json" -d '{"action": "buy", "ticker": "AAPL", "quantity": 10}'
+curl -X POST "http://127.0.0.1:80/webhook" -H "Content-Type: application/json" -d '{"action": "buy", "ticker": "AAPL", "quantity": 10}'
+```
+Or using the Ngrok URL:
+```bash
+curl -X POST "http://abc123.ngrok.io/webhook" -H "Content-Type: application/json" -d '{"action": "buy", "ticker": "AAPL", "quantity": 10}'
 ```
 
 ## Debugging & Troubleshooting
 
 - Check the console output for connection and order placement logs.
 - Ensure that your IB Gateway/TWS is running and the port is accessible.
+- Ensure Ngrok is running and you’re using the correct public URL for external requests.
 
 ## Shutting Down
 
-To stop the server, press `CTRL + C` in the terminal where `uvicorn` is running.
+To stop the server, press `CTRL + C` in the terminal where `uvicorn` and `ngrok` are running.
 
-## License
-This project is licensed under the MIT License.
+
