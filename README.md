@@ -65,10 +65,10 @@ uvicorn main:app --reload --port 80
 In a separate terminal window, run:
 
 ```bash
-ngrok http 80
+ngrok http --domain=abc123.ngrok-free.app 80
 ```
 
-- Ngrok will provide a URL (e.g., `http://abc123.ngrok.io`) that exposes your local server to the internet.
+- Ngrok will provide a URL (e.g., `http://abc123.ngrok-free.app`) that exposes your local server to the internet.
 
 ## Setting up Trading Alerts on TradingView
 
@@ -78,7 +78,7 @@ ngrok http 80
 4. In the alert configuration window, choose your desired conditions.
 5. Set the "Webhook URL" to the Ngrok URL you obtained earlier, with the `/webhook` endpoint, for example:
    ```
-   http://abc123.ngrok.io/webhook
+   http://abc123.ngrok-free.app/webhook
    ```
 6. For the "Alert Action" message, use a JSON payload like the example below to specify the trading action:
    ```json
@@ -119,7 +119,3 @@ curl -X POST "http://abc123.ngrok.io/webhook" -H "Content-Type: application/json
 ## Shutting Down
 
 To stop the server, press `CTRL + C` in the terminal where `uvicorn` and `ngrok` are running.
-
-```bash
-ngrok http --domain=mullet-legal-jolly.ngrok-free.app 80
-```
