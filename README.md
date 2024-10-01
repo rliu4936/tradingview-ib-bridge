@@ -69,6 +69,7 @@ ngrok http --domain=abc123.ngrok-free.app 80
 ```
 
 - Ngrok will provide a URL (e.g., `http://abc123.ngrok-free.app`) that exposes your local server to the internet.
+- Get a static domain here: `https://dashboard.ngrok.com/domains`
 
 ## Setting up Trading Alerts on TradingView
 
