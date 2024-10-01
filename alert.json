@@ -1,0 +1,58 @@
+{
+  "ticker": "{{ticker}}",
+  "exchange": "{{exchange}}",
+  "price": {
+    "open": "{{open}}",
+    "close": "{{close}}",
+    "high": "{{high}}",
+    "low": "{{low}}"
+  },
+  "volume": "{{volume}}",
+  "time": "{{time}}",
+  "timenow": "{{timenow}}",
+  "interval": "{{interval}}",
+  "currency": "{{syminfo.currency}}",
+  "basecurrency": "{{syminfo.basecurrency}}",
+  "plots": {
+    "plot_0": "{{plot_0}}",
+    "plot_1": "{{plot_1}}",
+    "plot_2": "{{plot_2}}",
+    "plot_3": "{{plot_3}}",
+    "plot_4": "{{plot_4}}",
+    "plot_5": "{{plot_5}}",
+    "plot_6": "{{plot_6}}",
+    "plot_7": "{{plot_7}}",
+    "plot_8": "{{plot_8}}",
+    "plot_9": "{{plot_9}}",
+    "plot_10": "{{plot_10}}",
+    "plot_11": "{{plot_11}}",
+    "plot_12": "{{plot_12}}",
+    "plot_13": "{{plot_13}}",
+    "plot_14": "{{plot_14}}",
+    "plot_15": "{{plot_15}}",
+    "plot_16": "{{plot_16}}",
+    "plot_17": "{{plot_17}}",
+    "plot_18": "{{plot_18}}",
+    "plot_19": "{{plot_19}}"
+  },
+  "strategy": {
+    "position_size": "{{strategy.position_size}}",
+    "order_action": "{{strategy.order.action}}",
+    "order_contracts": "{{strategy.order.contracts}}",
+    "order_price": "{{strategy.order.price}}",
+    "order_id": "{{strategy.order.id}}",
+    "order_comment": "{{strategy.order.comment}}",
+    "order_alert_message": "{{strategy.order.alert_message}}",
+    "market_position": "{{strategy.market_position}}",
+    "market_position_size": "{{strategy.market_position_size}}",
+    "prev_market_position": "{{strategy.prev_market_position}}",
+    "prev_market_position_size": "{{strategy.prev_market_position_size}}"
+  },
+  "custom_placeholders": {
+    "example_volume": "Volume: {{plot(\"Volume\")}}, Volume average: {{plot(\"Volume MA\")}}",
+    "example_series": "{{plot(\"series\")}}"
+  },
+  "alertcondition": {
+    "example_message": "price {{ticker}} = {{close}}"
+  }
+}
