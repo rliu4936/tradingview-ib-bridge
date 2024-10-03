@@ -1,6 +1,9 @@
 from contextlib import asynccontextmanager
+import random
 from ib_insync import *
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
+from datetime import datetime, timedelta
 
 # Initialize the Interactive Brokers client
 
@@ -24,6 +27,14 @@ async def lifespan(app: FastAPI):
 
 # Initialize FastAPI app with lifespan
 app = FastAPI(lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # You can restrict this to specific origins if needed
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.post("/webhook")
 async def webhook(request: Request):
@@ -56,6 +67,44 @@ async def webhook(request: Request):
     except Exception as e:
         print(f"Error processing webhook request: {e}")
         raise HTTPException(status_code=500, detail="Error processing webhook request")
+    
+
+def generate_realistic_data(num_entries=5, start_price=150):
+    data = []
+    current_time = datetime.now()
+    current_price = start_price  # Start with an initial price
+    
+    for i in range(num_entries):
+        # Generate realistic price changes
+        price_change = random.uniform(-2, 2)  # Small change for the next day's open price
+        open_price = current_price + price_change
+        
+        # Simulate close price with some random fluctuation
+        close_price = open_price + random.uniform(-1, 1)
+        
+        # High and low are based on open/close with some fluctuation
+        high_price = max(open_price, close_price) + random.uniform(0, 1)
+        low_price = min(open_price, close_price) - random.uniform(0, 1)
+        
+        # Store the candlestick data
+        data.append({
+            "time": int((current_time + timedelta(days=i)).timestamp()),  # Unix timestamp
+            "open": round(open_price, 2),
+            "high": round(high_price, 2),
+            "low": round(low_price, 2),
+            "close": round(close_price, 2)
+        })
+        
+        # Update the current price for the next iteration
+        current_price = close_price  # The next day's open is based on the previous close
+    
+    return data
+
+@app.get("/candlestick")
+def get_candlestick_data():
+    data = generate_realistic_data(50)  # Generate 5 random candlestick data points
+    return data
+
 
 
 async def place_order(action: str, ticker: str, quantity: int):
