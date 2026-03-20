@@ -1,122 +1,114 @@
-# FastAPI Interactive Brokers Integration
+# TradingView-IB Bridge
 
-This project integrates FastAPI with the Interactive Brokers (IB) API to handle webhook requests and place buy/sell orders asynchronously.
+A webhook bridge that connects TradingView alerts to Interactive Brokers for automated trade execution. TradingView strategy signals are received via a FastAPI webhook server and forwarded as live orders to IB Gateway/TWS.
+
+## Architecture
+
+```
+TradingView Alert ──> Ngrok ──> FastAPI Webhook Server ──> Interactive Brokers API
+```
+
+- **Backend**: FastAPI server with async IB connection management via `ib_insync`
+- **Frontend**: React app using `lightweight-charts` to display candlestick data from the backend
+- **Strategy**: Included PineScript moving average crossover strategy that generates buy/sell signals
+
+## Project Structure
+
+```
+backend/
+  main.py               # FastAPI server with webhook handler and IB order execution
+  get_data.py            # Historical data fetcher from IB
+  ib_insync_simple.py    # Standalone IB order placement example
+  ma_cross.pinescript    # Moving average crossover TradingView strategy
+  alert.json             # TradingView webhook alert JSON template
+frontend/
+  lightweight-charts-app/ # React app for candlestick chart visualization
+```
 
 ## Prerequisites
 
 - Python 3.7+
-- `ib_insync` library
-- `fastapi` library
-- `uvicorn` server
-- Ngrok (to expose your local server to the internet)
-- An active IB Gateway or Trader Workstation (TWS) running and configured for API access.
+- Node.js (for the frontend)
+- [IB Gateway or Trader Workstation (TWS)](https://www.interactivebrokers.com/en/trading/tws.php) running with API access enabled
+- [Ngrok](https://ngrok.com/) for exposing the local server to TradingView webhooks
 
-## Installation
+## Setup
 
-1. Clone the repository:
-
-   ```bash
-   git clone <repository-url>
-   cd <repository-folder>
-   ```
-
-2. Create and activate a virtual environment:
-
-   ```bash
-   python -m venv venv
-   # Activate the environment (Windows)
-   venv\Scripts\activate
-   # Activate the environment (macOS/Linux)
-   source venv/bin/activate
-   ```
-
-3. Install the required dependencies:
-
-   ```bash
-   pip install fastapi uvicorn ib_insync
-   ```
-
-4. Install Ngrok from the [official website](https://ngrok.com/download) and set it up.
-
-## Setting up Trader Workstation (TWS)
-
-Ensure that your IB Gateway or TWS is running and accessible on `localhost` at port `7497`:
-
-- Download and install TWS from the [official website](https://www.interactivebrokers.com/en/index.php?f=16040).
-- Open IB Gateway/TWS and configure the API settings:
-  - Check "Enable ActiveX and Socket Clients"
-  - Uncheck "Read-Only API"
-  - Set the port to `7497` for paper trading.
-
-## Running the Application
-
-You **must** run the FastAPI server on port 80, and expose it to the internet using Ngrok.
-
-### Start the FastAPI Server
+### 1. Install Backend Dependencies
 
 ```bash
+python -m venv venv
+source venv/bin/activate
+pip install fastapi uvicorn ib_insync
+```
+
+### 2. Configure IB Gateway/TWS
+
+- Enable **ActiveX and Socket Clients** in API settings
+- Disable **Read-Only API**
+- Set socket port to `7497` (paper trading) or `7496` (live)
+
+### 3. Start the Server
+
+```bash
+cd backend
 uvicorn main:app --reload --port 80
 ```
 
-- Replace `main` with your actual script name if it's different.
-
-### Start Ngrok
-
-In a separate terminal window, run:
+### 4. Expose via Ngrok
 
 ```bash
-ngrok http --domain=abc123.ngrok-free.app 80
+ngrok http 80
 ```
 
-- Ngrok will provide a URL (e.g., `http://abc123.ngrok-free.app`) that exposes your local server to the internet.
-- Get a static domain here: `https://dashboard.ngrok.com/domains`
+### 5. Configure TradingView Alerts
 
-## Setting up Trading Alerts on TradingView
+Set the webhook URL in your TradingView alert to your Ngrok URL:
 
-1. Open [TradingView](https://www.tradingview.com/) and log in to your account.
-2. Set up your trading chart and indicators as usual.
-3. Click the "Alert" button (or right-click on the chart and choose "Add Alert").
-4. In the alert configuration window, choose your desired conditions.
-5. Set the "Webhook URL" to the Ngrok URL you obtained earlier, with the `/webhook` endpoint, for example:
-   ```
-   http://abc123.ngrok-free.app/webhook
-   ```
-6. For the "Alert Action" message, use a JSON payload like the example below to specify the trading action:
-   ```json
-   {
-     "action": "{{strategy.order.action}}",
-     "ticker": "{{ticker}}",
-     "price": "{{close}}"
-   }
-   ```
-   Adjust `action`, `ticker`, and `quantity` as needed.
+```
+https://<your-domain>.ngrok-free.app/webhook
+```
 
-## Webhook Endpoint
-
-The server exposes a `/webhook` endpoint that accepts POST requests with the following JSON payload:
-
-### JSON Payload Example
+Use this JSON payload in the alert message:
 
 ```json
 {
-  "action": "buy",
-  "ticker": "AAPL",
-  "price": "10.0"
+  "action": "{{strategy.order.action}}",
+  "ticker": "{{ticker}}",
+  "quantity": 10
 }
 ```
 
-- `action`: `buy` or `sell`
-- `ticker`: The stock symbol (e.g., `AAPL` for Apple)
-- `price`: The price of shares to trade at
-
-### Sample Request
-
-You can test the endpoint using `curl` or tools like Postman:
+### 6. Start the Frontend (Optional)
 
 ```bash
-curl -X POST "http://abc123.ngrok.io/webhook" -H "Content-Type: application/json" -d '{"action": "buy", "ticker": "AAPL", "quantity": 10}'
+cd frontend/lightweight-charts-app
+npm install
+npm start
 ```
 
-## Shutting Down
+## Webhook API
 
-To stop the server, press `CTRL + C` in the terminal where `uvicorn` and `ngrok` are running.
+**POST** `/webhook`
+
+| Field      | Type   | Description                          |
+|------------|--------|--------------------------------------|
+| `action`   | string | `buy` or `sell`                      |
+| `ticker`   | string | Stock symbol (e.g., `AAPL`)          |
+| `quantity` | int    | Number of shares (default: 10)       |
+
+Example:
+
+```bash
+curl -X POST http://localhost:80/webhook \
+  -H "Content-Type: application/json" \
+  -d '{"action": "buy", "ticker": "AAPL", "quantity": 10}'
+```
+
+## Tech Stack
+
+- **FastAPI** - Async web framework for the webhook server
+- **ib_insync** - Async Python wrapper for the Interactive Brokers API
+- **React** - Frontend UI
+- **Lightweight Charts** - TradingView's charting library for candlestick visualization
+- **Ngrok** - Tunnel for exposing the local server to the internet
